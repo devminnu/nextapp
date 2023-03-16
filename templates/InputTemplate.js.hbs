@@ -1,22 +1,65 @@
 import React from "react";
 
-const {{pascalCase formName}}Input{{inputNumber}} = () => {
+const {{pascalCase formName}}Input{{inputNumber}} = ({ type }) => {
   const [inputValue, setInputValue] = React.useState("");
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
   };
 
+  let inputElement;
+
+  switch (type) {
+    case "text":
+      inputElement = (
+        <input
+          type="text"
+          id="{{formName}}Input{{inputNumber}}"
+          name="{{formName}}Input{{inputNumber}}"
+          value={inputValue}
+          onChange={handleInputChange}
+        />
+      );
+      break;
+    case "checkbox":
+      inputElement = (
+        <input
+          type="checkbox"
+          id="{{formName}}Input{{inputNumber}}"
+          name="{{formName}}Input{{inputNumber}}"
+          checked={inputValue}
+          onChange={handleInputChange}
+        />
+      );
+      break;
+    case "radio":
+      inputElement = (
+        <input
+          type="radio"
+          id="{{formName}}Input{{inputNumber}}"
+          name="{{formName}}Input{{inputNumber}}"
+          value={inputValue}
+          onChange={handleInputChange}
+        />
+      );
+      break;
+    default:
+      inputElement = (
+        <input
+          type="text"
+          id="{{formName}}Input{{inputNumber}}"
+          name="{{formName}}Input{{inputNumber}}"
+          value={inputValue}
+          onChange={handleInputChange}
+        />
+      );
+      break;
+  }
+
   return (
     <div>
       <label htmlFor="{{formName}}Input{{inputNumber}}">Input {{inputNumber}}</label>
-      <input
-        type="text"
-        id="{{formName}}Input{{inputNumber}}"
-        name="{{formName}}Input{{inputNumber}}"
-        value={inputValue}
-        onChange={handleInputChange}
-      />
+      {inputElement}
     </div>
   );
 };
