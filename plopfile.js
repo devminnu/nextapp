@@ -12,6 +12,12 @@ module.exports = function (plop) {
         name: "numberOfInputs",
         message: "How many inputs do you want to add to the form?",
       },
+      {
+        type: "list",
+        name: "inputType",
+        message: "What type of input do you want to add?",
+        choices: ["text", "checkbox", "radio"],
+      },
     ],
     actions: (data) => {
       const actions = [];
@@ -22,32 +28,18 @@ module.exports = function (plop) {
         templateFile: "templates/FormTemplate.js.hbs",
       });
 
-      for (let i = 0; i < data.numberOfInputs; i++) {
+      for (let i = 0; i < data.numberOfinputs; i++) {
         actions.push({
           type: "add",
           path: `components/forms/{{pascalCase formName}}Input${i + 1}.js`,
           templateFile: "templates/InputTemplate.js.hbs",
           data: {
+            formName: data.formName,
             inputNumber: i + 1,
+            type: data.inputType,
           },
         });
       }
-
-      const inputComponents = [];
-
-      for (let i = 0; i < data.numberOfInputs; i++) {
-        inputComponents.push(`{{${data.formName}Input${i + 1}}}`);
-      }
-
-      actions.push({
-        type: "modify",
-        path: "components/forms/{{pascalCase formName}}Form.js",
-        pattern: /<form>/,
-        template: `<form>\n${inputComponents.join(
-          "\n"
-        )}\n<button type="submit">Submit</button>\n`,
-      });
-
       return actions;
     },
   });
