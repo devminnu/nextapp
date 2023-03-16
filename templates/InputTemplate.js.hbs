@@ -1,10 +1,22 @@
 import React from "react";
 
 const {{pascalCase formName}}Input{{inputNumber}} = () => {
+  const [inputValue, setInputValue] = React.useState("");
+
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
+  };
+
   return (
     <div>
       <label htmlFor="{{formName}}Input{{inputNumber}}">Input {{inputNumber}}</label>
-      <input type="text" id="{{formName}}Input{{inputNumber}}" name="{{formName}}Input{{inputNumber}}" />
+      <input
+        type="text"
+        id="{{formName}}Input{{inputNumber}}"
+        name="{{formName}}Input{{inputNumber}}"
+        value={inputValue}
+        onChange={handleInputChange}
+      />
     </div>
   );
 };
