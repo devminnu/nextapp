@@ -27,8 +27,26 @@ module.exports = function (plop) {
           type: "add",
           path: `components/forms/{{pascalCase formName}}Input${i + 1}.js`,
           templateFile: "templates/InputTemplate.js.hbs",
+          data: {
+            inputNumber: i + 1,
+          },
         });
       }
+
+      const inputComponents = [];
+
+      for (let i = 0; i < data.numberOfInputs; i++) {
+        inputComponents.push(`{{${data.formName}Input${i + 1}}}`);
+      }
+
+      actions.push({
+        type: "modify",
+        path: "components/forms/{{pascalCase formName}}Form.js",
+        pattern: /<form>/,
+        template: `<form>\n${inputComponents.join(
+          "\n"
+        )}\n<button type="submit">Submit</button>\n`,
+      });
 
       return actions;
     },
