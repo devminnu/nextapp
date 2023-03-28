@@ -1,14 +1,26 @@
-import React from "react";
+import React from 'react';
 
-const {{pascalCase formName}}Form = () => {
+const {{pascalCase componentName}} = () => {
   return (
     <form>
-      {{#each inputs}}
-      <{{this}} />
-      {{/each}}
+      {{#if addNameField}}
+      <label htmlFor="name">Name:</label>
+      <input type="text" id="name" name="name" />
+      {{/if}}
+
+      {{#if addEmailField}}
+      <label htmlFor="email">Email:</label>
+      <input type="email" id="email" name="email" />
+      {{/if}}
+
+      {{#if addPhoneField}}
+      <label htmlFor="phone">Phone:</label>
+      <input type="tel" id="phone" name="phone" />
+      {{/if}}
+
       <button type="submit">Submit</button>
     </form>
   );
 };
 
-export default {{pascalCase formName}}Form;
+export default {{pascalCase componentName}};
