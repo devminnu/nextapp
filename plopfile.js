@@ -1,46 +1,75 @@
 module.exports = function (plop) {
-  plop.setGenerator("form", {
-    description: "Generate a dynamic form with dynamic inputs",
+  plop.setGenerator('form', {
+    description: 'Generate a dynamic form component',
     prompts: [
       {
-        type: "input",
-        name: "formName",
-        message: "What is the name of the form?",
+        type: 'input',
+        name: 'componentName',
+        message: 'What is the name of your component?',
       },
       {
-        type: "input",
-        name: "numberOfInputs",
-        message: "How many inputs do you want to add to the form?",
+        type: 'checkbox',
+        name: 'inputFields',
+        message: 'Select the input fields for your form:',
+        choices: [
+          {
+            name: 'Text Input',
+            value: 'TextInput',
+          },
+          {
+            name: 'Email Input',
+            value: 'EmailInput',
+          },
+          {
+            name: 'Number Input',
+            value: 'NumberInput',
+          },
+        ],
       },
       {
-        type: "list",
-        name: "inputType",
-        message: "What type of input do you want to add?",
-        choices: ["text", "checkbox", "radio"],
+        type: 'input',
+        name: 'additionalFields',
+        message: 'How many additional input fields would you like to add?',
       },
     ],
-    actions: (data) => {
-      const actions = [];
+    actions: [
+      {
+        type: 'add',
+        path: 'components/{{pascalCase componentName}}.jsx',
+        templateFile: 'templates/Form.jsx.hbs',
+        abortOnFail: true,
+      },
+      {
+        type: 'modify',
+        path: 'components/{{pascalCase componentName}}.jsx',
+        pattern: /({{inputFields}})/g,
+        template:
+          "{{#each inputFields}}{{> inputField}}{{/each}}{{#times additionalFields}}{{> inputField}}{{/times}}",
+      },
+    ],
+  });
 
-      actions.push({
-        type: "add",
-        path: "components/forms/{{pascalCase formName}}Form.js",
-        templateFile: "templates/FormTemplate.js.hbs",
-      });
+  plop.setPartial('inputField', '{{> (lookup . "value") }}\n');
 
-      for (let i = 0; i < data.numberOfinputs; i++) {
-        actions.push({
-          type: "add",
-          path: `components/forms/{{pascalCase formName}}Input${i + 1}.js`,
-          templateFile: "templates/InputTemplate.js.hbs",
-          data: {
-            formName: data.formName,
-            inputNumber: i + 1,
-            type: data.inputType,
-          },
-        });
-      }
-      return actions;
-    },
+  plop.setActionType('times', function (answers, config, plop) {
+    let iterations = parseInt(config.trim(), 10);
+    let output = '';
+    for (let i = 0; i < iterations; i++) {
+      output += plop.renderString(config.template, { iteration: i });
+    }
+    return output;
+  });
+
+  plop.setHelper('value', function (input) {
+    switch (input) {
+      case 'TextInput':
+        return '<input type="text" />';
+      case 'EmailInput':
+        return '<input type="email" />';
+      case 'NumberInput':
+        return '<input type="number" />';
+      default:
+        return '';
+    }
   });
 };
