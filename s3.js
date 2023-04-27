@@ -67,3 +67,44 @@ const uploadResult = await s3Client.send(new PutObjectCommand({
 }));
 
 console.log('File uploaded:', uploadResult.Location);
+
+//
+
+
+
+
+const { S3Client } = require('@aws-sdk/client-s3');
+const { fromToken } = require('@aws-sdk/credential-provider-imds');
+
+const credentials = fromToken({
+  roleArn: 'arn:aws:iam::123456789012:role/MyS3UploadRole',
+  roleSessionName: 'my-s3-upload-session',
+});
+
+const s3 = new S3Client({
+  credentials: credentials,
+  region: 'us-west-2',
+});
+
+
+
+
+
+const { PutObjectCommand } = require('@aws-sdk/client-s3');
+
+const params = {
+  Bucket: 'my-bucket',
+  Key: 'my-file.txt',
+  Body: 'Hello, world!',
+};
+
+const command = new PutObjectCommand(params);
+
+s3.send(command)
+  .then(() => {
+    console.log('File uploaded successfully!');
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+
