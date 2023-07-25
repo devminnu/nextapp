@@ -1,39 +1,11 @@
-// client.go
-package main
+	// Use reflection to loop over the struct fields and update if value is "Hello"
+	reflectValue := reflect.ValueOf(&myStruct).Elem()
+	reflectType := reflectValue.Type()
 
-import (
-	"bufio"
-	"fmt"
-	"net"
-	"os"
-	"strings"
-
-	"github.com/go-vgo/robotgo"
-)
-
-func main() {
-	conn, err := net.Dial("tcp", "server-ip:8080")
-	if err != nil {
-		fmt.Println("Error connecting to the server:", err.Error())
-		return
-	}
-	defer conn.Close()
-
-	fmt.Println("Connected to the server.")
-
-	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-		input := scanner.Text()
-		input = strings.TrimSpace(input)
-
-		if input == "exit" {
-			break
-		}
-
-		_, err := conn.Write([]byte(input))
-		if err != nil {
-			fmt.Println("Error sending data:", err.Error())
-			break
+	for i := 0; i < reflectValue.NumField(); i++ {
+		fieldValue := reflectValue.Field(i)
+		if fieldValue.Kind() == reflect.String && fieldValue.String() == "Hello" {
+			newValue := "Updated"
+			fieldValue.SetString(newValue)
 		}
 	}
-}
