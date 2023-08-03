@@ -1,12 +1,42 @@
-// Convert IPv4 to IPv6 (IPv4-mapped IPv6 address)
-func ipv4ToIPv6(ipv4 net.IP) net.IP {
-	ipv6 := make(net.IP, net.IPv6len)
-	// Set the first 10 bytes to 0x00
-	copy(ipv6, net.IPv6zero[:10])
-	// Set bytes 11 and 12 to 0xff
-	copy(ipv6[10:], net.IPv6unspecified[:2])
-	// Copy the last 4 bytes from the IPv4 address into the last 4 bytes of the IPv6 representation
-	copy(ipv6[12:], ipv4.To4())
+function trimSpaces(obj) {
+  if (typeof obj !== "object" || obj === null) {
+    // Base case: If the object is not an object or is null, return it as is.
+    if (typeof obj === "string") {
+      // If the value is a string, trim the spaces and return it.
+      return obj.trim();
+    }
+    return obj;
+  }
 
-	return ipv6
+  if (Array.isArray(obj)) {
+    // If the object is an array, process each element recursively.
+    for (let i = 0; i < obj.length; i++) {
+      obj[i] = trimSpaces(obj[i]);
+    }
+    return obj;
+  }
+
+  // Process the object's properties recursively and trim spaces from the values.
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const value = obj[key];
+      obj[key] = trimSpaces(value);
+    }
+  }
+
+  return obj;
 }
+
+// Example usage:
+const inputObj = {
+  name: " John Doe  ",
+  age: 25,
+  address: {
+    street: " 123 Main Street ",
+    city: " New York ",
+  },
+  hobbies: ["  Reading ", "  Writing", "   Coding   "],
+};
+
+trimSpaces(inputObj);
+console.log(inputObj);
