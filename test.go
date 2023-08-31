@@ -1,51 +1,47 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
-	"time"
-
-	"github.com/robfig/cron"
-	"github.com/hpcloud/tail"
+	"os"
+	"regexp"
+	"strings"
 )
 
 func main() {
-	c := cron.New()
-
-	// Schedule the job to run every hour
-	_, err := c.AddFunc("0 * * * *", func() {
-		fmt.Println("Running job at:", time.Now())
-		readUserAgentsFromLogs("/var/log/nginx/access.log")
-	})
+	logFilePath := "/var/log/nginx/access.log"
+	err := readUserAgentsFromLogs(logFilePath)
 	if err != nil {
-		log.Fatal("Error adding cron job:", err)
+		log.Fatal("Error:", err)
 	}
-
-	c.Start()
-
-	// Keep the program running
-	select {}
 }
 
-func readUserAgentsFromLogs(logPath string) {
-	t, err := tail.TailFile(logPath, tail.Config{Follow: true})
+func readUserAgentsFromLogs(logPath string) error {
+	file, err := os.Open(logPath)
 	if err != nil {
-		log.Println("Error opening log file:", err)
-		return
+		return err
 	}
+	defer file.Close()
 
-	for line := range t.Lines {
-		// Assuming the user agent is present as the last field in the log line
-		fields := splitLogLine(line.Text)
-		if len(fields) > 0 {
-			userAgent := fields[len(fields)-1]
-			fmt.Println("User Agent:", userAgent)
+	scanner := bufio.NewScanner(file)
+	userAgentRegex := regexp.MustCompile(`"([^"]*)"`)
+	for scanner.Scan() {
+		line := scanner.Text()
+		fields := strings.Fields(line)
+		if len(fields) > 11 {
+			userAgentField := fields[11]
+			userAgentMatches := userAgentRegex.FindStringSubmatch(userAgentField)
+			if len(userAgentMatches) > 1 {
+				userAgent := userAgentMatches[1]
+				fmt.Println("User Agent:", userAgent)
+			}
 		}
 	}
-}
 
-func splitLogLine(line string) []string {
-	// Customize this function according to the log format of your Nginx logs
-	// Here, we're assuming fields are separated by spaces
-	return strings.Fields(line)
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+
+	return nil
 }
