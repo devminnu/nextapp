@@ -1,13 +1,21 @@
-// Include the DOMPurify library (if you haven't already)
-// <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.0/purify.min.js"></script>
-
 // Fetch the ad content from your API
 fetch('/api/getAdContent')
    .then(response => response.text())
    .then(adHTML => {
-       // Sanitize the ad HTML with DOMPurify
-       const sanitizedAdHTML = DOMPurify.sanitize(adHTML);
+       // Create a DOMParser to parse the ad HTML
+       const parser = new DOMParser();
+       const parsedHTML = parser.parseFromString(adHTML, 'text/html');
 
-       // Insert the sanitized ad HTML into a DOM element on the webpage
-       document.getElementById('ad-container').innerHTML = sanitizedAdHTML;
+       // Extract the scripts from the parsed HTML
+       const scripts = parsedHTML.querySelectorAll('script');
+
+       // Iterate through the extracted scripts and execute them
+       scripts.forEach(script => {
+           const newScript = document.createElement('script');
+           newScript.textContent = script.textContent;
+           document.head.appendChild(newScript);
+       });
+
+       // Insert the sanitized ad HTML (without scripts) into a DOM element on the webpage
+       document.getElementById('ad-container').appendChild(parsedHTML.body);
    });
