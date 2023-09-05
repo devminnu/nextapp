@@ -1,21 +1,20 @@
+const { JSDOM } = require('jsdom');
+
 // Fetch the ad content from your API
 fetch('/api/getAdContent')
-   .then(response => response.text())
-   .then(adHTML => {
-       // Create a DOMParser to parse the ad HTML
-       const parser = new DOMParser();
-       const parsedHTML = parser.parseFromString(adHTML, 'text/html');
+    .then(response => response.text())
+    .then(adHTML => {
+        // Create a virtual DOM with jsdom
+        const dom = new JSDOM(adHTML);
 
-       // Extract the scripts from the parsed HTML
-       const scripts = parsedHTML.querySelectorAll('script');
+        // Extract and execute scripts
+        const scripts = Array.from(dom.window.document.querySelectorAll('script'));
+        scripts.forEach(script => {
+            const newScript = document.createElement('script');
+            newScript.textContent = script.textContent;
+            document.head.appendChild(newScript);
+        });
 
-       // Iterate through the extracted scripts and execute them
-       scripts.forEach(script => {
-           const newScript = document.createElement('script');
-           newScript.textContent = script.textContent;
-           document.head.appendChild(newScript);
-       });
-
-       // Insert the sanitized ad HTML (without scripts) into a DOM element on the webpage
-       document.getElementById('ad-container').appendChild(parsedHTML.body);
-   });
+        // Insert the sanitized ad HTML (without scripts) into a DOM element on the webpage
+        document.getElementById('ad-container').appendChild(dom.window.document.body);
+    });
