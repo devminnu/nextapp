@@ -1,30 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Execute Remote JS</title>
-</head>
-<body>
-    <h1>Execute Remote JavaScript</h1>
-    <script>
-        window.onload = function() {
-            // URL to fetch the JavaScript code from
-            var apiURL = "https://example.com/your-js-api-endpoint";
+// Include the DOMPurify library (if you haven't already)
+// <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.0/purify.min.js"></script>
 
-            // Create a new HTTP request
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", apiURL, true);
+// Fetch the ad content from your API
+fetch('/api/getAdContent')
+   .then(response => response.text())
+   .then(adHTML => {
+       // Sanitize the ad HTML with DOMPurify
+       const sanitizedAdHTML = DOMPurify.sanitize(adHTML);
 
-            // Define what to do when the response is received
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    var remoteJsCode = xhr.responseText;
-                    eval(remoteJsCode); // Execute the fetched JavaScript code
-                }
-            };
-
-            // Send the request
-            xhr.send();
-        };
-    </script>
-</body>
-</html>
+       // Insert the sanitized ad HTML into a DOM element on the webpage
+       document.getElementById('ad-container').innerHTML = sanitizedAdHTML;
+   });
