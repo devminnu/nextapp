@@ -1,20 +1,20 @@
+const express = require('express');
 const { JSDOM } = require('jsdom');
 
-// Fetch the ad content from your API
-fetch('/api/getAdContent')
-    .then(response => response.text())
-    .then(adHTML => {
-        // Create a virtual DOM with jsdom
-        const dom = new JSDOM(adHTML);
+const app = express();
+app.use(express.json());
 
-        // Extract and execute scripts
-        const scripts = Array.from(dom.window.document.querySelectorAll('script'));
-        scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            newScript.textContent = script.textContent;
-            document.head.appendChild(newScript);
-        });
+app.post('/render', (req, res) => {
+    const html = req.body.html; // HTML content with nested script tags
+    const dom = new JSDOM(html);
 
-        // Insert the sanitized ad HTML (without scripts) into a DOM element on the webpage
-        document.getElementById('ad-container').appendChild(dom.window.document.body);
-    });
+    // Execute JavaScript within the DOM
+    dom.window.evalScripts();
+
+    res.send(dom.serialize());
+});
+
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Node.js service is listening on port ${PORT}`);
+});
