@@ -1,4 +1,3 @@
-// Define the API URL that returns the ad HTML content
 const apiUrl = 'https://example.com/api/get-ad';
 
 // Function to fetch and insert the ad content
@@ -24,17 +23,19 @@ async function loadAd() {
         // Append the wrapper div to the ad container
         adContainer.appendChild(adWrapper);
 
-        // After inserting the HTML, you might want to execute any JavaScript in the ad content
-        // For example, you can execute scripts within the inserted content using a function like this:
-        function executeScripts() {
-            const scripts = adWrapper.querySelectorAll('script');
-            scripts.forEach((script) => {
-                const newScript = document.createElement('script');
-                newScript.text = script.textContent;
-                script.parentNode.replaceChild(newScript, script);
-            });
-        }
-        executeScripts();
+        // Add an event listener for the DOMContentLoaded event to execute scripts
+        adWrapper.addEventListener('DOMContentLoaded', () => {
+            // Execute scripts within the inserted content
+            function executeScripts() {
+                const scripts = adWrapper.querySelectorAll('script');
+                scripts.forEach((script) => {
+                    const newScript = document.createElement('script');
+                    newScript.text = script.textContent;
+                    script.parentNode.replaceChild(newScript, script);
+                });
+            }
+            executeScripts();
+        });
     } catch (error) {
         console.error('Error loading ad:', error);
     }
