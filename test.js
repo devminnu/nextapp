@@ -1,27 +1,21 @@
-function loadContent() {
-    // Get the container element
-    const container = document.getElementById('custom-iframe-container');
-
-    // Create an iframe-like element
-    const customIframe = document.createElement('div');
-    customIframe.classList.add('custom-iframe');
-
-    // Sample content with nested script tags
-    const contentHtml = `
-        <h1>Custom Iframe Content</h1>
-        <p>This is custom iframe content loaded using JavaScript.</p>
-        <script>
-            console.log("This script should not run when content is added.");
-        </script>
-    `;
-
-    // Use DOMParser to safely parse and append content
-    const parser = new DOMParser();
-    const parsedContent = parser.parseFromString(contentHtml, 'text/html');
-
-    // Append the parsed content to the custom iframe
-    customIframe.appendChild(parsedContent.body);
-
-    // Append the custom iframe to the container
-    container.appendChild(customIframe);
+function loadjQuery(callback) {
+  // Check if jQuery is already loaded
+  if (typeof jQuery === 'undefined') {
+    // jQuery is not loaded, so load it dynamically
+    const script = document.createElement('script');
+    script.src = 'https://code.jquery.com/jquery-3.6.0.min.js'; // Replace with the URL to the jQuery version you want to load
+    script.onload = callback; // Callback function to execute after jQuery is loaded
+    document.head.appendChild(script);
+  } else {
+    // jQuery is already loaded, so just call the callback function
+    callback();
+  }
 }
+
+// Example usage:
+loadjQuery(function() {
+  // Now you can use jQuery in your JavaScript code
+  $(document).ready(function() {
+    // Your jQuery code here
+  });
+});
