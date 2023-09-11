@@ -1,45 +1,27 @@
-const apiUrl = 'https://example.com/api/get-ad';
+function loadContent() {
+    // Get the container element
+    const container = document.getElementById('custom-iframe-container');
 
-// Function to fetch and insert the ad content
-async function loadAd() {
-    try {
-        // Make an API request to get the ad HTML content
-        const response = await fetch(apiUrl);
+    // Create an iframe-like element
+    const customIframe = document.createElement('div');
+    customIframe.classList.add('custom-iframe');
 
-        if (!response.ok) {
-            throw new Error(`API request failed with status ${response.status}`);
-        }
+    // Sample content with nested script tags
+    const contentHtml = `
+        <h1>Custom Iframe Content</h1>
+        <p>This is custom iframe content loaded using JavaScript.</p>
+        <script>
+            console.log("This script should not run when content is added.");
+        </script>
+    `;
 
-        // Parse the response as text
-        const adHtml = await response.text();
+    // Use DOMParser to safely parse and append content
+    const parser = new DOMParser();
+    const parsedContent = parser.parseFromString(contentHtml, 'text/html');
 
-        // Create a div element to hold the ad content
-        const adContainer = document.getElementById('ad-container');
-        const adWrapper = document.createElement('div');
+    // Append the parsed content to the custom iframe
+    customIframe.appendChild(parsedContent.body);
 
-        // Set the HTML content of the wrapper div with the ad HTML
-        adWrapper.innerHTML = adHtml;
-
-        // Append the wrapper div to the ad container
-        adContainer.appendChild(adWrapper);
-
-        // Add an event listener for the DOMContentLoaded event to execute scripts
-        adWrapper.addEventListener('DOMContentLoaded', () => {
-            // Execute scripts within the inserted content
-            function executeScripts() {
-                const scripts = adWrapper.querySelectorAll('script');
-                scripts.forEach((script) => {
-                    const newScript = document.createElement('script');
-                    newScript.text = script.textContent;
-                    script.parentNode.replaceChild(newScript, script);
-                });
-            }
-            executeScripts();
-        });
-    } catch (error) {
-        console.error('Error loading ad:', error);
-    }
+    // Append the custom iframe to the container
+    container.appendChild(customIframe);
 }
-
-// Call the loadAd function to fetch and insert the ad content
-loadAd();
