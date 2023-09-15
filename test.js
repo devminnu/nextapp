@@ -1,21 +1,25 @@
-function loadjQuery(callback) {
-  // Check if jQuery is already loaded
-  if (typeof jQuery === 'undefined') {
-    // jQuery is not loaded, so load it dynamically
-    const script = document.createElement('script');
-    script.src = 'https://code.jquery.com/jquery-3.6.0.min.js'; // Replace with the URL to the jQuery version you want to load
-    script.onload = callback; // Callback function to execute after jQuery is loaded
-    document.head.appendChild(script);
-  } else {
-    // jQuery is already loaded, so just call the callback function
-    callback();
-  }
+function loadContent(url, targetSelector) {
+  // Fetch the content from the specified URL
+  fetch(url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.text();
+    })
+    .then((html) => {
+      // Insert the fetched HTML into the specified DOM element
+      const targetElement = document.querySelector(targetSelector);
+      if (targetElement) {
+        targetElement.innerHTML = html;
+      } else {
+        throw new Error(`Target element "${targetSelector}" not found`);
+      }
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
 }
 
 // Example usage:
-loadjQuery(function() {
-  // Now you can use jQuery in your JavaScript code
-  $(document).ready(function() {
-    // Your jQuery code here
-  });
-});
+loadContent('example.html', '#target-div');
