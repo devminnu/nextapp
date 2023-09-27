@@ -1,25 +1,33 @@
-function loadContent(url, targetSelector) {
-  // Fetch the content from the specified URL
-  fetch(url)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.text();
-    })
-    .then((html) => {
-      // Insert the fetched HTML into the specified DOM element
-      const targetElement = document.querySelector(targetSelector);
-      if (targetElement) {
-        targetElement.innerHTML = html;
-      } else {
-        throw new Error(`Target element "${targetSelector}" not found`);
-      }
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-    });
+// Function to set a cookie
+function setCookie(name, value, daysToExpire) {
+  // Calculate the expiration date
+  const expirationDate = new Date();
+  expirationDate.setDate(expirationDate.getDate() + daysToExpire);
+
+  // Create the cookie string
+  const cookieString = `${name}=${value}; expires=${expirationDate.toUTCString()}; path=/`;
+
+  // Set the cookie
+  document.cookie = cookieString;
+}
+
+// Function to get a cookie by name
+function getCookie(name) {
+  const cookies = document.cookie.split('; ');
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i].split('=');
+    if (cookie[0] === name) {
+      return cookie[1];
+    }
+  }
+  return null;
 }
 
 // Example usage:
-loadContent('example.html', '#target-div');
+setCookie('username', 'JohnDoe', 7); // Set a cookie named "username" with a value that expires in 7 days
+const username = getCookie('username'); // Get the value of the "username" cookie
+if (username) {
+  console.log(`Welcome back, ${username}!`);
+} else {
+  console.log('No "username" cookie found.');
+}
